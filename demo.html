@@ -1,0 +1,108 @@
+<!doctype html>
+
+<meta charset="utf-8">
+<title>Dagre D3 Demo: Clusters</title>
+
+<link rel="stylesheet" href="demo.css">
+<script src="./d3.v4.min.js" charset="utf-8"></script>
+<script src="./dagre-d3.js"></script>
+
+<style id="css">
+.clusters rect {
+  fill: #00ffd0;
+  stroke: #999;
+  stroke-width: 1.5px;
+}
+
+text {
+  font-weight: 300;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
+  font-size: 14px;
+}
+
+.node rect {
+  stroke: rgb(31, 140, 173);
+  fill: #f1f1f1;
+  stroke-width: 1px;
+}
+
+.edgePath path {
+  stroke: #000;
+  stroke-width: 1px;
+}
+</style>
+
+<svg id="svg-canvas" width=600 height=400 style="margin:0 auto;"></svg>
+
+
+
+<script id="js">
+  var svg = d3.select("svg"),
+  inner = svg.select("g");
+
+  // Create the input graph
+  var g = new dagreD3.graphlib.Graph({compound:true})
+    .setGraph({
+      nodesep: 50,
+      ranksep: 50,
+      rankdir: "LR",
+      marginx: 0,
+      marginy: 0
+    })
+    .setDefaultEdgeLabel(function() { return {}; });
+
+    // Here we're setting the nodes
+    g.setNode('root', {label: '用户角色'});
+    g.setNode('a', {label: '经办'});
+    g.setNode('a1', {label: '系统管理'});
+    g.setNode('a2', {label: '日志管理'});
+    g.setNode('a3', {label: '统计分析'});
+    g.setNode('a4', {label: '个人中心'});
+    g.setNode('b', {label: '一级审核'});
+    g.setNode('b1', {label: '统计分析'});
+    g.setNode('b2', {label: '个人中心'});
+
+    // Set up edges, no special attributes.
+    g.setEdge('root', 'a',{arrowhead: 'undirected'});
+    g.setEdge('a', 'a1',{arrowhead: 'undirected'});
+    g.setEdge('a', 'a2',{arrowhead: 'undirected'});
+    g.setEdge('a', 'a3',{arrowhead: 'undirected'});
+    g.setEdge('a', 'a4',{arrowhead: 'undirected'});
+    g.setEdge('root', 'b',{arrowhead: 'undirected'});
+    g.setEdge('b', 'b1',{arrowhead: 'undirected'});
+    g.setEdge('b', 'b2',{arrowhead: 'undirected'});
+    //Here we're setting the border radius of the nodes
+    g.nodes().forEach(function(v) {
+      var node = g.node(v);
+      // Round the corners of the nodes
+      node.ry = node.rx = 5;
+    });
+
+    // Create the renderer
+    var render = new dagreD3.render();
+    // Set up an SVG group so that we can translate the final graph.
+    var svg = d3.select("svg"),
+        svgGroup = svg.append("g");
+        // Set up zoom support
+    var zoom = d3.zoom().on("zoom", function() {
+      svgGroup.attr("transform", d3.event.transform);
+        });
+    svg.call(zoom);
+    // Run the renderer. This is what draws the final graph.
+    render(d3.select("svg g"), g);
+
+    // Zoom and scale to fit
+    var graphWidth = g.graph().width + 80;
+    var graphHeight = g.graph().height + 40;
+    var width = parseInt(svg.style("width").replace(/px/, ""));
+    var height = parseInt(svg.style("height").replace(/px/, ""));
+    var zoomScale = Math.min(width / graphWidth, height / graphHeight);
+    var translateX = (width / 2) - ((graphWidth * zoomScale) / 2)
+    var translateY = (height / 2) - ((graphHeight * zoomScale) / 2);
+    var svgZoom = 1 ? svg.transition().duration(500) : svg;
+    svgZoom.call(zoom.transform,d3.zoomIdentity.translate(translateX, translateY).scale(zoomScale));
+
+
+
+</script>
+
